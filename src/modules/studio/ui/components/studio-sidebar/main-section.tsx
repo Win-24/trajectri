@@ -1,0 +1,78 @@
+
+"use client";
+
+import Link from "next/link";
+import { useAuth, useClerk } from "@clerk/nextjs";
+import { FlameIcon, HomeIcon, PlaySquareIcon } from "lucide-react";
+
+import { 
+         SidebarGroup, 
+         SidebarGroupContent, 
+         SidebarMenu, 
+         SidebarMenuButton, 
+         SidebarMenuItem 
+        } 
+    from "@/components/ui/sidebar";
+
+
+
+const items = [
+    {
+        title: "Dashboard",
+        url: "/",
+        icon: PlaySquareIcon,
+        auth: true,
+    },
+    {
+        title: "Uploads",
+        url: "/",
+        icon: FlameIcon,
+    },
+    {
+        title: "Wallet",
+        url: "/",
+        icon: FlameIcon,
+    },
+];
+
+
+export const MainSection = () => {
+    const clerk = useClerk();
+    const { isSignedIn } = useAuth();
+
+    return (
+        <SidebarGroup>
+            <SidebarGroupContent>
+                <SidebarMenu>
+                    {
+                        items.map((item) => (
+                            <SidebarMenuItem key={item.title}>
+                                <SidebarMenuButton
+                                    tooltip={item.title}
+                                    asChild
+                                    isActive={false} // TODO: Change to look at current pathname
+                                    onClick={(e) => {
+                                        if (!isSignedIn && item.auth) {
+                                            e.preventDefault();
+                                            return clerk.openSignIn();
+                                        }
+                                    }} 
+                                >
+                                    <Link 
+                                        className="flex items-center gap-4"
+                                        href={item.url}
+                                    >
+                                        <item.icon />
+                                        <span className="text-sm">
+                                            {item.title}
+                                        </span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        ))
+                    }
+                </SidebarMenu>
+            </SidebarGroupContent>
+        </SidebarGroup>
+    );
+}
